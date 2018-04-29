@@ -124,6 +124,7 @@ class ArgumentListFilter(object):
             '-iwithprefixbefore' : (1, ArgumentListFilter.compileBinaryCallback),
             '-isystem' : (1, ArgumentListFilter.compileBinaryCallback),
             '-isysroot' : (1, ArgumentListFilter.compileBinaryCallback),
+            '--sysroot' : (1, ArgumentListFilter.compileLinkBinaryCallback),
             '-iquote' : (1, ArgumentListFilter.compileBinaryCallback),
             '-imultilib' : (1, ArgumentListFilter.compileBinaryCallback),
 
@@ -269,7 +270,7 @@ class ArgumentListFilter(object):
             #iam: mac stuff...
             r'-mmacosx-version-min=.+$' :  (0, ArgumentListFilter.compileUnaryCallback),
 
-            r'^--sysroot=.+$' :  (0, ArgumentListFilter.compileUnaryCallback),
+            r'^--sysroot=.+$' :  (0, ArgumentListFilter.compileLinkUnaryCallback),
             r'^-print-prog-name=.*$' : (0, ArgumentListFilter.compileUnaryCallback),
             r'^-print-file-name=.*$' : (0, ArgumentListFilter.compileUnaryCallback),
             #iam: -xc from yices. why BD?
@@ -444,6 +445,14 @@ class ArgumentListFilter(object):
 
     def linkBinaryCallback(self, flag, arg):
         _logger.debug('linkBinaryCallback: %s %s', flag, arg)
+        self.linkArgs.append(flag)
+        self.linkArgs.append(arg)
+
+    #flags common to both linking and compiling (sysroot for example)
+    def compileLinkBinaryCallback(self, flag, arg):
+        _logger.debug('compileLinkBinaryCallback: %s %s', flag, arg)
+        self.compileArgs.append(flag)
+        self.compileArgs.append(arg)
         self.linkArgs.append(flag)
         self.linkArgs.append(arg)
 
